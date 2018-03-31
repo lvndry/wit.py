@@ -16,7 +16,8 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds = 5):
 
     # defining headers for HTTP request
     headers = {'authorization': 'Bearer ' + conf.wit_access_token,
-               'Content-Type': 'audio/wav'}
+               'Content-Type': 'audio/wav'
+              }
 
     # making an HTTP post request
     resp = requests.post(API_ENDPOINT, headers = headers,
