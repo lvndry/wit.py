@@ -1,6 +1,7 @@
 import requests
 import json
 import config.config as conf
+# from json_utils import has_attribute
 from Recorder import record_audio, read_audio
 
 # Wit speech API endpoint
@@ -51,17 +52,20 @@ def startRecognize(AUDIO_FILENAME, num_seconds = 5):
 
     # converting response content to JSON format
     data = json.loads(resp.content)
-    if data['entities']:
-        intent = data['entities']['intent'][0]['value']
-        if str(intent) == 'startAssitant':
-            return True
+
+    if data['error']:
         return False
+
+    intent = data['entities']['intent'][0]['value']
+    if str(intent) == 'startAssitant':
+        return True
+    return False
 
 if __name__ == "__main__":
     while 1:
         ok = False
         while (ok == False):
-            ok = startRecognize('starter.wav', 3)
+            ok = startRecognize('starter.wav', 2)
 
         text, data =  RecognizeSpeech('myspeech.wav', 4)
         print("\nYou said: {}".format(text))
