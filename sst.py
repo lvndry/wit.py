@@ -1,7 +1,6 @@
 import requests
 import json
 import config.config as conf
-# from json_utils import has_attribute
 from Recorder import record_audio, read_audio
 
 # Wit speech API endpoint
@@ -16,8 +15,8 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds = 5):
     audio = read_audio(AUDIO_FILENAME)
 
     # defining headers for HTTP request
-    headers = {'authorization': 'Bearer ' + conf.wit_access_token,
-               'Content-Type': 'audio/wav'
+    headers = {'authorization': conf.authorization + conf.wit_access_token,
+               'Content-Type': conf.content_type
               }
 
     # making an HTTP post request
@@ -42,8 +41,8 @@ def startRecognize(AUDIO_FILENAME, num_seconds = 5):
     audio = read_audio(AUDIO_FILENAME)
 
     # defining headers for HTTP request
-    headers = {'authorization': 'Bearer ' + conf.wit_access_token,
-               'Content-Type': 'audio/wav'
+    headers = {'authorization': conf.authorization + conf.wit_access_token,
+               'Content-Type': conf.content_type
               }
 
     # making an HTTP post request
@@ -68,5 +67,5 @@ if __name__ == "__main__":
             ok = startRecognize('starter.wav', 2)
 
         text, data =  RecognizeSpeech('myspeech.wav', 4)
+        print("\nData: {}".format(data))
         print("\nYou said: {}".format(text))
-        print("\nText: {}".format(data))
