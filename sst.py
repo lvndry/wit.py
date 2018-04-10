@@ -1,17 +1,22 @@
 import config.config as conf
 import json
+import os
 import requests
+import sys
 import time
 from Recorder import record_audio, read_audio
 
 # Wit speech API endpoint
-API_ENDPOINT = 'https://api.wit.ai/speech'
+WIT_API_ENDPOINT = 'https://api.wit.ai/speech'
 
 def has_attribute(data, attribute):
     return attribute in data and data[attribute] is not None
 
 def command_error():
-    print ("Unavailable command")
+    print("Unavailable command")
+
+def isWavFile(path):
+    return os.path.exists(path) is not False
 
 def startRecognize(AUDIO_FILENAME, num_seconds = 5):
 
@@ -27,7 +32,7 @@ def startRecognize(AUDIO_FILENAME, num_seconds = 5):
               }
 
     # making an HTTP post request
-    resp = requests.post(API_ENDPOINT, headers = headers,
+    resp = requests.post(WIT_API_ENDPOINT, headers = headers,
                          data = audio)
 
     # converting response content to JSON format
@@ -44,10 +49,11 @@ def startRecognize(AUDIO_FILENAME, num_seconds = 5):
     return False
 
 
-def RecognizeSpeech(AUDIO_FILENAME, num_seconds = 5):
+def RecognizeSpeech(AUDIO_FILENAME, num_seconds = 5, live=True):
     start_time = time.time()
     # record audio of specified length in specified audio file
-    record_audio(num_seconds, AUDIO_FILENAME)
+    if live == True:
+        record_audio(num_seconds, AUDIO_FILENAME)
 
     # reading audio
     audio = read_audio(AUDIO_FILENAME)
@@ -58,29 +64,19 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds = 5):
               }
 
     # making an HTTP post request
-    resp = requests.post(API_ENDPOINT, headers = headers,
+    resp = requests.post(WIT_API_ENDPOINT, headers = headers,
                          data = audio)
 
     # converting response content to JSON format
     data = json.loads(resp.content)
 
     excTime = round(time.time() - start_time, 2)
-    # return the text
+
     return data, excTime
 
-if __name__ == "__main__":
-    while 1:
-        ok = False
-        while (ok == False):
-            ok = startRecognize('starter.wav', 2)
-
-        print("What can I do for you ?")
-
-        data, excTime =  RecognizeSpeech('myspeech.wav', 4)
-        print("\nData: {}".format(data))
-
-        if has_attribute(data, '_text'):
-            print("\nYou said: {}".format(data['_text']))
+def build_URL(data):
+    if has_attribute(data, '_text'):
+        print("\nYou said: {}".format(data['_text']))
         url = "http://api.opentime.com/"
 
         if has_attribute(data, 'entities'):
@@ -93,6 +89,34 @@ if __name__ == "__main__":
             if has_attribute(data['entities'], 'contact'):
                 contact = data['entities']['contact'][0]['value']
                 url += contact
-        print('API call: `%s`' % url)
+    return url
 
-        print("\nTime: %s seconds" % excTime)
+
+if __name__ == "__main__":
+    print("Opentime vocal assistant\n")
+    
+    if len(sys.argv) > 1:
+        path = os.getcwd() + '/' + sys.argv[1]
+        print('Path: ' + path)
+
+        if isWavFile(path):
+            data, excTime =  RecognizeSpeech(path, 4, False)
+            url = build_URL(data)
+            print('\nAPI call: `%s`' % url)
+            print("\nTime: %s seconds" % excTime)
+        else:
+            print('Make sure this is the good path to the wav file')
+    else:
+        while 1:
+            trigger = False
+            while (trigger == False):
+                trigger = startRecognize('starter.wav', 2)
+
+                print("What can I do for you ?")
+
+                data, excTime =  RecognizeSpeech('myspeech.wav', 4)
+                print("\nData: {}".format(data))
+                url = build_URL(data)
+
+                print('\nAPI call: `%s`' % url)
+                print("\nTime: %s seconds" % excTime)
