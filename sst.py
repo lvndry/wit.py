@@ -33,9 +33,10 @@ def startRecognize(AUDIO_FILENAME, num_seconds = 5):
         print('Error: say `ok opentime` or `opentime`')
         return False
 
-    intent = data['entities']['intent'][0]['value']
-    if str(intent) == 'startAssitant':
-        return True
+    if has_attribute(data['entities'], 'intent'):
+        intent = data['entities']['intent'][0]['value']
+        if str(intent) == 'startAssitant':
+            return True
     return False
 
 
