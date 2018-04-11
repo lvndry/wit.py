@@ -1,6 +1,8 @@
 from ctypes import *
 from contextlib import contextmanager
 import pyaudio
+import soundfile as sf
+import sys
 import wave
 
 ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
@@ -65,9 +67,16 @@ def record_audio(RECORD_SECONDS, WAVE_OUTPUT_FILENAME):
     waveFile.setframerate(RATE)
     waveFile.writeframes(b''.join(frames))
 
+    w, fs = sf.read(WAVE_OUTPUT_FILENAME)
+    vol_rms = w.max() - w.min()
+    print(vol_rms)
+
+    if vol_rms <= 0.3:
+        waveFile.close()
+        return False
     # closing the wave file object
     waveFile.close()
-
+    return True
 
 def read_audio(WAVE_FILENAME):
     # function to read audio(wav) file
