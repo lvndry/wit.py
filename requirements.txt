@@ -1,0 +1,11 @@
+ctypes
+contextlib
+platform
+pyaudio
+soundfile
+sys
+wave
+json
+requests
+sys
+time
