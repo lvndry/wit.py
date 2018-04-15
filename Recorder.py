@@ -1,5 +1,6 @@
 from ctypes import *
 from contextlib import contextmanager
+import platform
 import pyaudio
 import soundfile as sf
 import sys
@@ -28,9 +29,11 @@ def record_audio(RECORD_SECONDS, WAVE_OUTPUT_FILENAME):
     #--------------------------------------------------------#
 
     # creating PyAudio object
-    with noalsaerr():
+    if platform.system() == 'Linux':
+        with noalsaerr():
+            audio = pyaudio.PyAudio()
+    else:
         audio = pyaudio.PyAudio()
-
     # open a new stream for microphone
     # It creates a PortAudio Stream Wrapper class object
     stream = audio.open(format=FORMAT,channels=CHANNELS,
@@ -68,6 +71,7 @@ def record_audio(RECORD_SECONDS, WAVE_OUTPUT_FILENAME):
     waveFile.writeframes(b''.join(frames))
 
     w, fs = sf.read(WAVE_OUTPUT_FILENAME)
+
     vol_rms = w.max() - w.min()
     print(vol_rms)
 

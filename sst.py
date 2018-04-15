@@ -44,7 +44,7 @@ def startRecognize(AUDIO_FILENAME, num_seconds=5):
     resp = requests.post(WIT_API_ENDPOINT, headers=headers,
                          data=audio)
     request_time = round(time.time() - start_request, 2)
-    print('The request is ' + str(request_time) + 's long')
+    print('Request: ' + str(request_time) + 's')
 
     # converting response content to JSON format
     data = json.loads(resp.content)
@@ -75,7 +75,7 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds=5, live=True):
 
     # defining headers for HTTP request
     headers = {'authorization': conf.authorization + conf.wit_access_token,
-               'Content-Type': conf.content_type
+               'Content-Type': conf.content_type,
                }
 
     start_request = time.time()
@@ -83,7 +83,7 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds=5, live=True):
     resp = requests.post(WIT_API_ENDPOINT, headers=headers,
                          data=audio)
     request_time = round(time.time() - start_request, 2)
-    print('The request is ' + str(request_time) + 's long')
+    print('Request ' + str(request_time) + 's')
 
     # converting response content to JSON format
     data = json.loads(resp.content)
@@ -115,7 +115,10 @@ if __name__ == "__main__":
     print("Opentime vocal assistant\n")
 
     if len(sys.argv) > 1:
-        path = os.getcwd() + '/' + sys.argv[1]
+        if platform.system() == 'Windows':
+            path = os.getcwd() + '\\' + sys.argv[1]
+        else:
+            path = os.getcwd() + '/' + sys.argv[1]
         print('Path: ' + path)
 
         if isWavFile(path):
