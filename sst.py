@@ -1,6 +1,7 @@
 import config.config as conf
 import json
 import os
+import platform
 import requests
 import sys
 import time
@@ -15,7 +16,7 @@ def has_attribute(data, attribute):
 
 
 def command_error():
-    print("I didn't understand what you said")
+    print("Error: Wit.ai doesn't understand this command")
 
 
 def isWavFile(path):
@@ -66,9 +67,9 @@ def RecognizeSpeech(AUDIO_FILENAME, num_seconds=5, live=True):
     if live == True:
         wav_record = record_audio(num_seconds, AUDIO_FILENAME)
 
-    if wav_record == False:
-        print("Sorry can't understand what you said")
-        return False
+        if wav_record == False:
+            print("Sorry can't understand what you said")
+            return False
 
     # reading audio
     audio = read_audio(AUDIO_FILENAME)
@@ -115,6 +116,7 @@ if __name__ == "__main__":
     print("Opentime vocal assistant\n")
 
     if len(sys.argv) > 1:
+        print('Start analyzing wav file...')
         if platform.system() == 'Windows':
             path = os.getcwd() + '\\' + sys.argv[1]
         else:
